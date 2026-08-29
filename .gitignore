@@ -39,3 +39,5 @@ next-env.d.ts
 /output/
 /outputs/
 /work/
+
+.vercel
