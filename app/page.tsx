@@ -151,7 +151,7 @@ const initialForm: ProjectForm = {
   nsCNo: '',
   email: '',
   parentProjectNo: '',
-  managementFeeRequired: true,
+  managementFeeRequired: false,
   cooperationType: '',
   projectName: '',
   category: '',
@@ -529,79 +529,72 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#2bb9b0] text-slate-950">
       <header className="border-b border-emerald-900 bg-black text-white">
-        <div className="flex flex-col gap-3 px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex min-w-0 items-center gap-4">
-            <div className="flex h-14 w-48 shrink-0 items-center overflow-hidden rounded border border-emerald-700 bg-black md:w-72">
-              <img
-                src="/cgust-logo.png"
-                alt="長庚科技大學"
-                className="h-full w-full object-contain"
-              />
-            </div>
-            <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-              <span className="rounded bg-emerald-900 px-2 py-1 font-mono font-semibold text-emerald-100">
-                FG51MRP1
-              </span>
-              <span className="text-emerald-100">研究計劃經費預算建檔</span>
-              <span className="text-emerald-100">版本 1141106</span>
-            </div>
-            <h1 className="mt-1 text-xl font-semibold">研究計畫預算建檔工作台</h1>
-            </div>
+        <div className="flex items-center justify-between gap-4 px-3 py-2">
+          <div className="flex h-14 w-48 shrink-0 items-center overflow-hidden rounded border border-emerald-700 bg-black md:w-72">
+            <img
+              src="/cgust-logo.png"
+              alt="長庚科技大學"
+              className="h-full w-full object-contain"
+            />
           </div>
-          <div className="flex flex-wrap gap-2 text-slate-950">
-            <Button className="bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={searchProject}>
+          <div className="flex min-w-0 flex-1 items-center justify-end gap-3 overflow-x-auto">
+            <div className="flex shrink-0 flex-nowrap gap-2 text-slate-950">
+            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={searchProject}>
               <Search />
               查詢
             </Button>
-            <Button className="bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={clearForm}>
+            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={clearForm}>
               <RotateCcw />
               清除
             </Button>
-            <Button className="bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={leavePage}>
+            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={leavePage}>
               <LogOut />
               離開
             </Button>
-            <Button className="bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={openNewProjectDialog}>
+            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={openNewProjectDialog}>
               <FilePlus2 />
               新增
             </Button>
-            <Button className="bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={deleteProject}>
+            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={deleteProject}>
               <Trash2 />
               刪除
             </Button>
-            <Button className="bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={saveProject}>
+            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={saveProject}>
               <Save />
               存檔
             </Button>
-            <Button className="bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={() => moveRecord('prev')}>
+            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={() => moveRecord('prev')}>
               <ChevronUp />
               上筆
             </Button>
-            <Button className="bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={() => moveRecord('next')}>
+            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={() => moveRecord('next')}>
               <ChevronDown />
               下筆
             </Button>
-            <Button className="bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={() => patchForm({ closed: true })}>
+            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={() => patchForm({ closed: true })}>
               <LockKeyhole />
               結案
             </Button>
-            <Button className="bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={() => movePage('prev')}>
+            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={() => movePage('prev')}>
               <ChevronLeft />
               上一頁
             </Button>
-            <Button className="bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={() => movePage('next')}>
+            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={() => movePage('next')}>
               <ChevronRight />
               下一頁
             </Button>
+            </div>
           </div>
         </div>
       </header>
 
       <div className="overflow-x-auto px-1 py-1">
         <section className="mx-auto min-w-[1080px] max-w-[1080px] bg-[#2bb9b0] pb-1">
-          <div className="mx-auto mb-1 w-[400px] border border-yellow-200 bg-[#087c73] px-4 py-0 text-center text-xl font-semibold leading-7 text-yellow-200">
-            研究計劃經費預算建檔(1)
+          <div className="relative mx-auto mb-1 w-[400px] border border-yellow-200 bg-[#087c73] px-4 py-0 text-center text-xl font-semibold leading-7 text-yellow-200">
+            研究計劃經費預算建檔
+            <span className="absolute right-[-335px] top-0 text-base font-semibold leading-7 text-yellow-100">
+              版本 1141106
+            </span>
           </div>
 
           <div className="mb-1 border-2 border-pink-200 bg-[#f5a9c9] px-2 pb-2 pt-1 shadow-[inset_0_0_0_1px_#e485a7]">
@@ -701,11 +694,9 @@ export default function Home() {
                 <Input value={form.extensionDate} onChange={(event) => patchForm({ extensionDate: event.target.value })} />
               </LegacyField>
               <LegacyField label="統一編號">
-                <div className="grid grid-cols-[82px_76px_86px_34px] gap-0.5">
+                <div className="grid grid-cols-[1fr_1fr] gap-0.5">
                   <Input value={form.taxId} onChange={(event) => patchForm({ taxId: event.target.value })} />
                   <Input value={form.externalNo} onChange={(event) => patchForm({ externalNo: event.target.value })} />
-                  <span className="flex items-center justify-end bg-[#07857f] px-2 text-white">計劃年期</span>
-                  <Input value={form.projectTerm} onChange={(event) => patchForm({ projectTerm: event.target.value })} />
                 </div>
               </LegacyField>
               <LegacyField label="IACUC編號">
@@ -771,6 +762,20 @@ export default function Home() {
                   <NativeSelectOption value=""></NativeSelectOption>
                   <NativeSelectOption value="傑出">傑出</NativeSelectOption>
                   <NativeSelectOption value="一般">一般</NativeSelectOption>
+                </NativeSelect>
+              </LegacyField>
+              <LegacyField label="計劃年期">
+                <NativeSelect
+                  className="w-full"
+                  value={form.projectTerm}
+                  onChange={(event) => patchForm({ projectTerm: event.target.value })}
+                >
+                  <NativeSelectOption value=""></NativeSelectOption>
+                  {projectTerms.map((term) => (
+                    <NativeSelectOption key={term} value={`第${term}年`}>
+                      第{term}年
+                    </NativeSelectOption>
+                  ))}
                 </NativeSelect>
               </LegacyField>
               <LegacyField label="IRB編號">
