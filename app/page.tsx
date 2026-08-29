@@ -102,6 +102,8 @@ type ProjectDeleteResponse = {
   projectNo?: string;
 };
 
+type DateFieldKey = 'startDate' | 'endDate' | 'extensionDate' | 'revokeDate';
+
 type CodeForm = {
   fundingSource: string;
   nature: string;
@@ -266,9 +268,9 @@ const campuses = [
 
 const startYears = ['114', '115', '116', '117', '118', '119', '120'];
 const projectTerms = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
-const toolbarButtonClass = 'h-10 w-[72px] shrink-0 gap-1 px-1 text-sm bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8] [&_svg]:size-4';
-const exportMasterButtonClass = 'h-10 w-[86px] shrink-0 gap-1 px-1 text-sm bg-[#d9f99d] text-slate-950 hover:bg-[#bef264] [&_svg]:size-4';
-const exportDetailButtonClass = 'h-10 w-[86px] shrink-0 gap-1 px-1 text-sm bg-[#bae6fd] text-slate-950 hover:bg-[#7dd3fc] [&_svg]:size-4';
+const toolbarButtonClass = 'h-9 w-[70px] shrink-0 gap-1 px-1 text-sm bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8] [&_svg]:size-4';
+const exportMasterButtonClass = 'h-9 w-[84px] shrink-0 gap-1 px-1 text-sm bg-[#d9f99d] text-slate-950 hover:bg-[#bef264] [&_svg]:size-4';
+const exportDetailButtonClass = 'h-9 w-[84px] shrink-0 gap-1 px-1 text-sm bg-[#bae6fd] text-slate-950 hover:bg-[#7dd3fc] [&_svg]:size-4';
 
 const researchCategories = [
   '一般研究計劃',
@@ -321,6 +323,48 @@ function moneyOrBlank(value: number) {
   return value === 0 ? '' : money(value);
 }
 
+function normalizeDate(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return '';
+  }
+
+  let year = '';
+  let month = '';
+  let day = '';
+  const compact = trimmed.replace(/\D/g, '');
+
+  if (/^\d{8}$/.test(compact)) {
+    year = compact.slice(0, 4);
+    month = compact.slice(4, 6);
+    day = compact.slice(6, 8);
+  } else {
+    const match = trimmed.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+    if (match) {
+      [, year, month, day] = match;
+    }
+  }
+
+  if (!year || !month || !day) {
+    return value;
+  }
+
+  const parsedYear = Number(year);
+  const parsedMonth = Number(month);
+  const parsedDay = Number(day);
+  const date = new Date(parsedYear, parsedMonth - 1, parsedDay);
+  const isValid =
+    date.getFullYear() === parsedYear &&
+    date.getMonth() === parsedMonth - 1 &&
+    date.getDate() === parsedDay;
+
+  if (!isValid) {
+    return value;
+  }
+
+  return `${year}/${month.padStart(2, '0')}/${day.padStart(2, '0')}`;
+}
+
 export default function Home() {
   const [form, setForm] = useState<ProjectForm>(initialForm);
   const [rows, setRows] = useState<BudgetRow[]>(blankRows);
@@ -353,6 +397,10 @@ export default function Home() {
 
   function patchForm(patch: Partial<ProjectForm>) {
     setForm((current) => ({ ...current, ...patch }));
+  }
+
+  function formatDateField(key: DateFieldKey) {
+    patchForm({ [key]: normalizeDate(form[key]) });
   }
 
   function clearForm() {
@@ -523,10 +571,17 @@ export default function Home() {
     }
 
     try {
+      const normalizedForm = {
+        ...form,
+        startDate: normalizeDate(form.startDate),
+        endDate: normalizeDate(form.endDate),
+        extensionDate: normalizeDate(form.extensionDate),
+        revokeDate: normalizeDate(form.revokeDate),
+      };
       const response = await fetch('/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ form, rows }),
+        body: JSON.stringify({ form: normalizedForm, rows }),
       });
       const data = (await response.json()) as ProjectSaveResponse;
 
@@ -535,7 +590,7 @@ export default function Home() {
         return;
       }
 
-      patchForm({ lockedNotice: `計劃案號 ${data.projectNo ?? form.projectNo} 已存入資料庫。` });
+      setForm({ ...normalizedForm, lockedNotice: `計劃案號 ${data.projectNo ?? form.projectNo} 已存入資料庫。` });
     } catch {
       patchForm({ lockedNotice: '存檔失敗，請確認 DATABASE_URL 或網路連線。' });
     }
@@ -570,8 +625,8 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#2bb9b0] text-slate-950">
       <header className="border-b border-emerald-900 bg-black text-white">
-        <div className="flex items-center justify-between gap-4 px-3 py-2">
-          <div className="flex h-14 w-48 shrink-0 items-center overflow-hidden bg-black md:w-64">
+        <div className="flex items-center justify-between gap-4 px-3 py-1">
+          <div className="flex h-12 w-48 shrink-0 items-center overflow-hidden bg-black md:w-64">
             <Image
               src="/cgust-logo.png"
               alt="長庚科技大學"
@@ -635,19 +690,19 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="overflow-x-auto px-1 py-1">
-        <section className="mx-auto min-w-[1080px] max-w-[1080px] bg-[#2bb9b0] pb-1">
-          <div className="relative mb-1 h-7">
-            <div className="mx-auto w-[400px] border border-yellow-200 bg-[#087c73] px-4 py-0 text-center text-xl font-semibold leading-7 text-yellow-200">
+      <div className="overflow-x-auto px-1 py-0.5">
+        <section className="mx-auto min-w-[1080px] max-w-[1080px] bg-[#2bb9b0] pb-0.5 [&_input:not([type=checkbox])]:h-7 [&_select]:h-7">
+          <div className="relative mb-0.5 h-6">
+            <div className="mx-auto w-[400px] border border-yellow-200 bg-[#087c73] px-4 py-0 text-center text-lg font-semibold leading-6 text-yellow-200">
               研究計劃經費預算建檔
             </div>
-            <div className="absolute bottom-0 right-0 px-2 text-sm font-semibold leading-7 text-yellow-100">
+            <div className="absolute bottom-0 right-0 px-2 text-sm font-semibold leading-6 text-yellow-100">
               版本 1141106
             </div>
           </div>
 
-          <div className="mb-1 border-2 border-pink-200 bg-[#f5a9c9] px-2 pb-2 pt-1 shadow-[inset_0_0_0_1px_#e485a7]">
-            <div className="-mt-6 mb-1 w-fit bg-[#12a986] px-1 text-base font-semibold leading-6 text-yellow-100">
+          <div className="mb-0.5 border-2 border-pink-200 bg-[#f5a9c9] px-2 pb-1 pt-0.5 shadow-[inset_0_0_0_1px_#e485a7]">
+            <div className="-mt-5 mb-0.5 w-fit bg-[#12a986] px-1 text-base font-semibold leading-5 text-yellow-100">
               查詢輸入
             </div>
             <div className="grid grid-cols-[88px_175px_1fr] items-center gap-3">
@@ -736,13 +791,25 @@ export default function Home() {
                     </NativeSelect>
                   </LegacyField>
                   <LegacyField label="開始日期">
-                    <Input value={form.startDate} onChange={(event) => patchForm({ startDate: event.target.value })} />
+                    <Input
+                      value={form.startDate}
+                      onChange={(event) => patchForm({ startDate: event.target.value })}
+                      onBlur={() => formatDateField('startDate')}
+                    />
                   </LegacyField>
                   <LegacyField label="結束日期">
-                    <Input value={form.endDate} onChange={(event) => patchForm({ endDate: event.target.value })} />
+                    <Input
+                      value={form.endDate}
+                      onChange={(event) => patchForm({ endDate: event.target.value })}
+                      onBlur={() => formatDateField('endDate')}
+                    />
                   </LegacyField>
                   <LegacyField label="展延日期">
-                    <Input value={form.extensionDate} onChange={(event) => patchForm({ extensionDate: event.target.value })} />
+                    <Input
+                      value={form.extensionDate}
+                      onChange={(event) => patchForm({ extensionDate: event.target.value })}
+                      onBlur={() => formatDateField('extensionDate')}
+                    />
                   </LegacyField>
                   <LegacyField label="統一編號">
                     <div className="grid grid-cols-[1fr_1fr] gap-0.5">
@@ -779,7 +846,7 @@ export default function Home() {
               </div>
 
               <LegacyField label="計劃名稱">
-                <Input className="h-[62px]" value={form.projectName} onChange={(event) => patchForm({ projectName: event.target.value })} />
+                <Input className="h-[44px]" value={form.projectName} onChange={(event) => patchForm({ projectName: event.target.value })} />
               </LegacyField>
               <LegacyField label="結案註記">
                 <div className="grid grid-cols-[38px_154px_1fr] gap-0.5">
@@ -807,7 +874,11 @@ export default function Home() {
                 </NativeSelect>
               </LegacyField>
               <LegacyField label="撤銷生效日">
-                <Input value={form.revokeDate} onChange={(event) => patchForm({ revokeDate: event.target.value })} />
+                <Input
+                  value={form.revokeDate}
+                  onChange={(event) => patchForm({ revokeDate: event.target.value })}
+                  onBlur={() => formatDateField('revokeDate')}
+                />
               </LegacyField>
               <LegacyField label="院外計畫類別">
                 <NativeSelect
@@ -860,8 +931,8 @@ export default function Home() {
                   <NativeSelectOption value="應收">應收</NativeSelectOption>
                 </NativeSelect>
               </LegacyField>
-              <label className="grid min-h-[31px] grid-cols-[238px_24px_1fr] items-center gap-0.5">
-                <span className="flex h-[31px] items-center justify-end bg-[#2bb9b0] px-2 text-right font-semibold text-fuchsia-800">
+              <label className="grid min-h-7 grid-cols-[238px_24px_1fr] items-center gap-0.5">
+                <span className="flex h-7 items-center justify-end bg-[#2bb9b0] px-2 text-right font-semibold text-fuchsia-800">
                   國科會/國衛院延伸件計畫
                 </span>
                 <input
@@ -889,18 +960,18 @@ export default function Home() {
             </div>
           </div>
 
-          <section className="mt-2">
+          <section className="mt-0.5">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[33px]"></TableHead>
-                  <TableHead className="w-[190px]">費 用 別</TableHead>
-                  <TableHead className="w-[128px]">預算總額</TableHead>
-                  <TableHead className="w-[137px]">院內補助金額</TableHead>
-                  <TableHead className="w-[137px]">院外補助金額</TableHead>
-                  <TableHead className="w-[137px]">院內核銷金額</TableHead>
-                  <TableHead className="w-[137px]">院外核銷金額</TableHead>
-                  <TableHead className="w-[127px]">預算餘額</TableHead>
+                  <TableHead className="h-7 w-[33px] px-1 py-0"></TableHead>
+                  <TableHead className="h-7 w-[190px] px-1 py-0">費 用 別</TableHead>
+                  <TableHead className="h-7 w-[128px] px-1 py-0">預算總額</TableHead>
+                  <TableHead className="h-7 w-[137px] px-1 py-0">院內補助金額</TableHead>
+                  <TableHead className="h-7 w-[137px] px-1 py-0">院外補助金額</TableHead>
+                  <TableHead className="h-7 w-[137px] px-1 py-0">院內核銷金額</TableHead>
+                  <TableHead className="h-7 w-[137px] px-1 py-0">院外核銷金額</TableHead>
+                  <TableHead className="h-7 w-[127px] px-1 py-0">預算餘額</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -908,25 +979,25 @@ export default function Home() {
                   const rowBalance = row.budget - row.internalSpent - row.externalSpent;
                   return (
                     <TableRow key={index}>
-                      <TableCell>
+                      <TableCell className="p-0.5">
                         <Input
-                          className="h-[31px] min-w-0 text-center font-mono font-semibold"
+                          className="h-7 min-w-0 text-center font-mono font-semibold"
                           value={row.code}
                           onChange={(event) => updateRow(index, 'code', event.target.value)}
                         />
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="p-0.5">
                         <Input
-                          className="h-[31px] min-w-0"
+                          className="h-7 min-w-0"
                           value={row.name}
                           onChange={(event) => updateRow(index, 'name', event.target.value)}
                         />
                       </TableCell>
                       {(['budget', 'internalSubsidy', 'externalSubsidy', 'internalSpent', 'externalSpent'] as const).map(
                         (key) => (
-                          <TableCell key={key}>
+                          <TableCell key={key} className="p-0.5">
                             <Input
-                              className="h-[31px] min-w-0 text-right"
+                              className="h-7 min-w-0 text-right"
                               inputMode="numeric"
                               value={row[key] || ''}
                               onChange={(event) => updateRow(index, key, event.target.value)}
@@ -934,21 +1005,21 @@ export default function Home() {
                           </TableCell>
                         ),
                       )}
-                      <TableCell className="text-right font-semibold">{moneyOrBlank(rowBalance)}</TableCell>
+                      <TableCell className="p-0.5 text-right font-semibold">{moneyOrBlank(rowBalance)}</TableCell>
                     </TableRow>
                   );
                 })}
               </TableBody>
               <TableFooter>
                 <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell className="text-center text-lg">合　　計</TableCell>
-                  <TableCell className="text-right">{moneyOrBlank(totals.budget)}</TableCell>
-                  <TableCell className="text-right">{moneyOrBlank(totals.internalSubsidy)}</TableCell>
-                  <TableCell className="text-right">{moneyOrBlank(totals.externalSubsidy)}</TableCell>
-                  <TableCell className="text-right">{moneyOrBlank(totals.internalSpent)}</TableCell>
-                  <TableCell className="text-right">{moneyOrBlank(totals.externalSpent)}</TableCell>
-                  <TableCell className="text-right">{moneyOrBlank(balance)}</TableCell>
+                  <TableCell className="p-1"></TableCell>
+                  <TableCell className="p-1 text-center text-base">合　　計</TableCell>
+                  <TableCell className="p-1 text-right">{moneyOrBlank(totals.budget)}</TableCell>
+                  <TableCell className="p-1 text-right">{moneyOrBlank(totals.internalSubsidy)}</TableCell>
+                  <TableCell className="p-1 text-right">{moneyOrBlank(totals.externalSubsidy)}</TableCell>
+                  <TableCell className="p-1 text-right">{moneyOrBlank(totals.internalSpent)}</TableCell>
+                  <TableCell className="p-1 text-right">{moneyOrBlank(totals.externalSpent)}</TableCell>
+                  <TableCell className="p-1 text-right">{moneyOrBlank(balance)}</TableCell>
                 </TableRow>
               </TableFooter>
             </Table>
@@ -1123,8 +1194,8 @@ function LegacyField({
   children: React.ReactNode;
 }) {
   return (
-    <label className={`grid min-h-[34px] grid-cols-[108px_minmax(0,1fr)] items-center gap-1 ${className ?? ''}`}>
-      <span className="flex h-[34px] items-center justify-end bg-[#2bb9b0] px-1 text-right text-base font-semibold text-slate-950">
+    <label className={`grid min-h-7 grid-cols-[108px_minmax(0,1fr)] items-center gap-1 ${className ?? ''}`}>
+      <span className="flex h-7 items-center justify-end bg-[#2bb9b0] px-1 text-right text-base font-semibold text-slate-950">
         {label}
       </span>
       {children}
