@@ -962,7 +962,9 @@ export default function Home() {
           style={{ width: 'min(820px, calc(100vw - 2rem))', maxWidth: 'calc(100vw - 2rem)' }}
         >
           <DialogHeader className="items-center">
-            <DialogTitle className="text-xl font-bold text-yellow-300">研究計劃案號編碼</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-white drop-shadow-[0_1px_1px_#064e3b]">
+              研究計劃案號編碼
+            </DialogTitle>
           </DialogHeader>
           <div className="grid gap-x-7 gap-y-3 md:grid-cols-2">
             <Field label="經費來源">
@@ -1103,7 +1105,7 @@ function Field({
 }) {
   return (
     <label className={`grid min-h-8 grid-cols-[104px_minmax(170px,1fr)] items-center gap-2 ${className ?? ''}`}>
-      <span className="flex h-8 items-center justify-end bg-[#07857f] px-2 text-right text-xs font-medium text-white">
+      <span className="flex h-8 items-center justify-end bg-[#07857f] px-2 text-right text-sm font-medium text-white">
         {label}
       </span>
       {children}
