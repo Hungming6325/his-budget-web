@@ -1,11 +1,10 @@
 'use client';
 
+import Image from 'next/image';
 import { useMemo, useState } from 'react';
 import {
   Check,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   ChevronUp,
   FilePlus2,
   LockKeyhole,
@@ -93,6 +92,11 @@ type ProjectLookupResponse = {
 };
 
 type ProjectSaveResponse = {
+  error?: string;
+  projectNo?: string;
+};
+
+type ProjectDeleteResponse = {
   error?: string;
   projectNo?: string;
 };
@@ -261,7 +265,7 @@ const campuses = [
 
 const startYears = ['114', '115', '116', '117', '118', '119', '120'];
 const projectTerms = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
-const toolbarButtonClass = 'w-[104px] shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]';
+const toolbarButtonClass = 'h-10 w-[72px] shrink-0 gap-1 px-1 text-sm bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8] [&_svg]:size-4';
 
 const researchCategories = [
   '一般研究計劃',
@@ -319,7 +323,6 @@ export default function Home() {
   const [rows, setRows] = useState<BudgetRow[]>(blankRows);
   const [query, setQuery] = useState('');
   const [codeOpen, setCodeOpen] = useState(false);
-  const [savedAt, setSavedAt] = useState('尚未儲存');
   const [codeForm, setCodeForm] = useState<CodeForm>(blankCodeForm);
 
   const totals = useMemo(
@@ -353,15 +356,14 @@ export default function Home() {
     setForm(initialForm);
     setRows(blankRows);
     setQuery('');
-    setSavedAt('尚未儲存');
   }
 
   async function searchProject() {
-    const projectNo = query.trim().toUpperCase();
-    if (query.trim().toUpperCase() === 'NMRPF3R0341') {
+    const projectNo = (query.trim() || form.projectNo.trim()).toUpperCase();
+    if (projectNo === 'NMRPF3R0341') {
       setForm(sampleProject);
       setRows(sampleRows);
-      setSavedAt('載入範例資料');
+      setQuery(projectNo);
       return;
     }
 
@@ -382,7 +384,7 @@ export default function Home() {
       if (data.project) {
         setForm(data.project.form);
         setRows(data.project.rows.length ? data.project.rows : blankRows);
-        setSavedAt('已從資料庫載入');
+        setQuery(data.project.form.projectNo);
         return;
       }
     } catch {
@@ -394,6 +396,7 @@ export default function Home() {
       projectNo,
       lockedNotice: '查無資料，可用新增流程建立此案號。',
     });
+    setQuery(projectNo);
     setRows(blankRows);
   }
 
@@ -443,6 +446,7 @@ export default function Home() {
       category: form.category || '個別型',
       lockedNotice: '案號已產生，請續填主持人、日期、計畫名稱與費用明細。',
     });
+    setQuery(projectNo);
     setCodeOpen(false);
   }
 
@@ -451,27 +455,62 @@ export default function Home() {
     setCodeOpen(true);
   }
 
-  function copyProject() {
-    patchForm({
-      projectNo: form.projectNo ? `${form.projectNo}-COPY` : '',
-      closed: false,
-      lockedNotice: '已建立副本，請確認案號、日期與預算後再存檔。',
-    });
-    setSavedAt('副本尚未儲存');
+  async function deleteProject() {
+    const projectNo = (form.projectNo.trim() || query.trim()).toUpperCase();
+    if (!projectNo) {
+      patchForm({ lockedNotice: '請先輸入或查詢計劃編號再刪除。' });
+      return;
+    }
+
+    if (!window.confirm(`確定刪除計劃案號 ${projectNo}？`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/projects?projectNo=${encodeURIComponent(projectNo)}`, {
+        method: 'DELETE',
+      });
+      const data = (await response.json()) as ProjectDeleteResponse;
+
+      if (!response.ok) {
+        patchForm({ lockedNotice: data.error ?? '刪除失敗，請稍後再試。' });
+        return;
+      }
+
+      setForm({ ...initialForm, lockedNotice: `計劃案號 ${data.projectNo ?? projectNo} 已從資料庫刪除。` });
+      setRows(blankRows);
+      setQuery('');
+    } catch {
+      patchForm({ lockedNotice: '刪除失敗，請確認 DATABASE_URL 或網路連線。' });
+    }
   }
 
-  function deleteProject() {
-    setForm(initialForm);
-    setRows(blankRows);
-    setSavedAt('已刪除目前畫面資料');
-  }
+  async function moveRecord(direction: 'prev' | 'next') {
+    const projectNo = (form.projectNo.trim() || query.trim()).toUpperCase();
+    try {
+      const params = new URLSearchParams({ move: direction });
+      if (projectNo) {
+        params.set('projectNo', projectNo);
+      }
+      const response = await fetch(`/api/projects?${params.toString()}`);
+      const data = (await response.json()) as ProjectLookupResponse;
 
-  function moveRecord(direction: 'prev' | 'next') {
-    patchForm({ lockedNotice: direction === 'prev' ? '已切換至上筆範例位置。' : '已切換至下筆範例位置。' });
-  }
+      if (!response.ok) {
+        patchForm({ lockedNotice: data.error ?? '資料切換失敗，請稍後再試。' });
+        return;
+      }
 
-  function movePage(direction: 'prev' | 'next') {
-    patchForm({ lockedNotice: direction === 'prev' ? '已切換至上一頁功能位置。' : '已切換至下一頁功能位置。' });
+      if (!data.project) {
+        patchForm({ lockedNotice: direction === 'prev' ? '已經是第一筆資料。' : '已經是最後一筆資料。' });
+        return;
+      }
+
+      setForm(data.project.form);
+      setRows(data.project.rows.length ? data.project.rows : blankRows);
+      setQuery(data.project.form.projectNo);
+    } catch {
+      patchForm({ lockedNotice: '資料切換失敗，請確認 DATABASE_URL 或網路連線。' });
+    }
   }
 
   async function saveProject() {
@@ -493,7 +532,6 @@ export default function Home() {
         return;
       }
 
-      setSavedAt(new Date().toLocaleString('zh-TW', { hour12: false }));
       patchForm({ lockedNotice: `計劃案號 ${data.projectNo ?? form.projectNo} 已存入資料庫。` });
     } catch {
       patchForm({ lockedNotice: '存檔失敗，請確認 DATABASE_URL 或網路連線。' });
@@ -526,15 +564,17 @@ export default function Home() {
     <main className="min-h-screen bg-[#2bb9b0] text-slate-950">
       <header className="border-b border-emerald-900 bg-black text-white">
         <div className="flex items-center justify-between gap-4 px-3 py-2">
-          <div className="flex h-14 w-48 shrink-0 items-center overflow-hidden rounded border border-emerald-700 bg-black md:w-72">
-            <img
+          <div className="flex h-14 w-48 shrink-0 items-center overflow-hidden rounded border border-emerald-700 bg-black md:w-64">
+            <Image
               src="/cgust-logo.png"
               alt="長庚科技大學"
+              width={512}
+              height={112}
               className="h-full w-full object-contain"
             />
           </div>
-          <div className="flex min-w-0 flex-1 items-center justify-start gap-3 overflow-x-auto">
-            <div className="flex shrink-0 flex-nowrap gap-2 text-slate-950">
+          <div className="flex min-w-0 flex-1 items-center justify-start gap-2 overflow-hidden">
+            <div className="flex shrink-0 flex-nowrap gap-1.5 text-slate-950">
               <Button className={toolbarButtonClass} variant="outline" onClick={openNewProjectDialog}>
                 <FilePlus2 />
                 新增
@@ -566,14 +606,6 @@ export default function Home() {
               <Button className={toolbarButtonClass} variant="outline" onClick={() => patchForm({ closed: true })}>
                 <LockKeyhole />
                 結案
-              </Button>
-              <Button className={toolbarButtonClass} variant="outline" onClick={() => movePage('prev')}>
-                <ChevronLeft />
-                上一頁
-              </Button>
-              <Button className={toolbarButtonClass} variant="outline" onClick={() => movePage('next')}>
-                <ChevronRight />
-                下一頁
               </Button>
             </div>
           </div>
@@ -900,11 +932,11 @@ export default function Home() {
       </div>
 
       <Dialog open={codeOpen} onOpenChange={setCodeOpen}>
-        <DialogContent className="max-w-xl border-2 border-emerald-900 bg-[#c8c5df] p-5 shadow-2xl">
+        <DialogContent className="w-[820px] max-w-[calc(100vw-2rem)] border-2 border-emerald-900 bg-[#c8c5df] p-5 shadow-2xl">
           <DialogHeader className="items-center">
             <DialogTitle className="text-xl font-bold text-yellow-300">研究計劃案號編碼</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className="grid gap-x-7 gap-y-3 md:grid-cols-2">
             <Field label="經費來源">
               <NativeSelect
                 className="w-full"
@@ -1042,7 +1074,7 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <label className={`grid min-h-8 grid-cols-[104px_minmax(0,1fr)] items-center gap-1 ${className ?? ''}`}>
+    <label className={`grid min-h-8 grid-cols-[104px_minmax(170px,1fr)] items-center gap-2 ${className ?? ''}`}>
       <span className="flex h-8 items-center justify-end bg-[#07857f] px-2 text-right text-xs font-medium text-white">
         {label}
       </span>

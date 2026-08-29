@@ -64,25 +64,8 @@ function amount(value: unknown) {
   return Number.isFinite(Number(value)) ? Number(value) : 0;
 }
 
-export async function GET(request: Request) {
-  const projectNo = new URL(request.url).searchParams.get('projectNo')?.trim();
-  if (!projectNo) {
-    return NextResponse.json({ error: '請輸入計劃編號。' }, { status: 400 });
-  }
-
+async function projectResponse(project: Record<string, unknown>) {
   const sql = db();
-  const projects = await sql`
-    SELECT *
-    FROM research_projects
-    WHERE project_no = ${projectNo}
-    LIMIT 1
-  `;
-
-  if (!projects[0]) {
-    return NextResponse.json({ project: null });
-  }
-
-  const project = projects[0];
   const rows = await sql`
     SELECT *
     FROM project_budget_items
@@ -140,6 +123,88 @@ export async function GET(request: Request) {
       })),
     },
   });
+}
+
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const projectNo = url.searchParams.get('projectNo')?.trim();
+  const move = url.searchParams.get('move');
+  if (!projectNo && !move) {
+    return NextResponse.json({ error: '請輸入計劃編號。' }, { status: 400 });
+  }
+
+  const sql = db();
+  let projects;
+
+  if (move === 'prev') {
+    projects = projectNo
+      ? await sql`
+          SELECT *
+          FROM research_projects
+          WHERE project_no < ${projectNo}
+          ORDER BY project_no DESC
+          LIMIT 1
+        `
+      : await sql`
+          SELECT *
+          FROM research_projects
+          ORDER BY project_no DESC
+          LIMIT 1
+        `;
+  } else if (move === 'next') {
+    projects = projectNo
+      ? await sql`
+          SELECT *
+          FROM research_projects
+          WHERE project_no > ${projectNo}
+          ORDER BY project_no ASC
+          LIMIT 1
+        `
+      : await sql`
+          SELECT *
+          FROM research_projects
+          ORDER BY project_no ASC
+          LIMIT 1
+        `;
+  } else {
+    projects = await sql`
+      SELECT *
+      FROM research_projects
+      WHERE project_no = ${projectNo}
+      LIMIT 1
+    `;
+  }
+
+  if (!projects[0]) {
+    return NextResponse.json({ project: null });
+  }
+
+  return projectResponse(projects[0]);
+}
+
+export async function DELETE(request: Request) {
+  const projectNo = new URL(request.url).searchParams.get('projectNo')?.trim();
+  if (!projectNo) {
+    return NextResponse.json({ error: '請輸入要刪除的計劃編號。' }, { status: 400 });
+  }
+
+  const sql = db();
+  const projects = await sql`
+    SELECT id
+    FROM research_projects
+    WHERE project_no = ${projectNo}
+    LIMIT 1
+  `;
+
+  if (!projects[0]) {
+    return NextResponse.json({ error: '查無此計劃編號，無法刪除。' }, { status: 404 });
+  }
+
+  const projectId = projects[0].id;
+  await sql`DELETE FROM project_budget_items WHERE project_id = ${projectId}`;
+  await sql`DELETE FROM research_projects WHERE id = ${projectId}`;
+
+  return NextResponse.json({ ok: true, projectNo });
 }
 
 export async function POST(request: Request) {
