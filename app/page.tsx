@@ -533,48 +533,48 @@ export default function Home() {
               className="h-full w-full object-contain"
             />
           </div>
-          <div className="flex min-w-0 flex-1 items-center justify-end gap-3 overflow-x-auto">
+          <div className="flex min-w-0 flex-1 items-center justify-start gap-3 overflow-x-auto">
             <div className="flex shrink-0 flex-nowrap gap-2 text-slate-950">
-            <Button className={toolbarButtonClass} variant="outline" onClick={searchProject}>
-              <Search />
-              查詢
-            </Button>
-            <Button className={toolbarButtonClass} variant="outline" onClick={clearForm}>
-              <RotateCcw />
-              清除
-            </Button>
-            <Button className={toolbarButtonClass} variant="outline" onClick={openNewProjectDialog}>
-              <FilePlus2 />
-              新增
-            </Button>
-            <Button className={toolbarButtonClass} variant="outline" onClick={deleteProject}>
-              <Trash2 />
-              刪除
-            </Button>
-            <Button className={toolbarButtonClass} variant="outline" onClick={saveProject}>
-              <Save />
-              存檔
-            </Button>
-            <Button className={toolbarButtonClass} variant="outline" onClick={() => moveRecord('prev')}>
-              <ChevronUp />
-              上筆
-            </Button>
-            <Button className={toolbarButtonClass} variant="outline" onClick={() => moveRecord('next')}>
-              <ChevronDown />
-              下筆
-            </Button>
-            <Button className={toolbarButtonClass} variant="outline" onClick={() => patchForm({ closed: true })}>
-              <LockKeyhole />
-              結案
-            </Button>
-            <Button className={toolbarButtonClass} variant="outline" onClick={() => movePage('prev')}>
-              <ChevronLeft />
-              上一頁
-            </Button>
-            <Button className={toolbarButtonClass} variant="outline" onClick={() => movePage('next')}>
-              <ChevronRight />
-              下一頁
-            </Button>
+              <Button className={toolbarButtonClass} variant="outline" onClick={openNewProjectDialog}>
+                <FilePlus2 />
+                新增
+              </Button>
+              <Button className={toolbarButtonClass} variant="outline" onClick={clearForm}>
+                <RotateCcw />
+                清除
+              </Button>
+              <Button className={toolbarButtonClass} variant="outline" onClick={deleteProject}>
+                <Trash2 />
+                刪除
+              </Button>
+              <Button className={toolbarButtonClass} variant="outline" onClick={saveProject}>
+                <Save />
+                存檔
+              </Button>
+              <Button className={toolbarButtonClass} variant="outline" onClick={searchProject}>
+                <Search />
+                查詢
+              </Button>
+              <Button className={toolbarButtonClass} variant="outline" onClick={() => moveRecord('prev')}>
+                <ChevronUp />
+                上筆
+              </Button>
+              <Button className={toolbarButtonClass} variant="outline" onClick={() => moveRecord('next')}>
+                <ChevronDown />
+                下筆
+              </Button>
+              <Button className={toolbarButtonClass} variant="outline" onClick={() => patchForm({ closed: true })}>
+                <LockKeyhole />
+                結案
+              </Button>
+              <Button className={toolbarButtonClass} variant="outline" onClick={() => movePage('prev')}>
+                <ChevronLeft />
+                上一頁
+              </Button>
+              <Button className={toolbarButtonClass} variant="outline" onClick={() => movePage('next')}>
+                <ChevronRight />
+                下一頁
+              </Button>
             </div>
           </div>
         </div>
