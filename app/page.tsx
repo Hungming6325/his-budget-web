@@ -935,7 +935,10 @@ export default function Home() {
       </div>
 
       <Dialog open={codeOpen} onOpenChange={setCodeOpen}>
-        <DialogContent className="w-[820px] max-w-[calc(100vw-2rem)] border-2 border-emerald-900 bg-[#c8c5df] p-5 shadow-2xl">
+        <DialogContent
+          className="max-w-none border-2 border-emerald-900 bg-[#c8c5df] p-5 shadow-2xl"
+          style={{ width: 'min(820px, calc(100vw - 2rem))', maxWidth: 'calc(100vw - 2rem)' }}
+        >
           <DialogHeader className="items-center">
             <DialogTitle className="text-xl font-bold text-yellow-300">研究計劃案號編碼</DialogTitle>
           </DialogHeader>
