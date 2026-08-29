@@ -6,6 +6,7 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  Download,
   FilePlus2,
   LockKeyhole,
   RotateCcw,
@@ -266,6 +267,8 @@ const campuses = [
 const startYears = ['114', '115', '116', '117', '118', '119', '120'];
 const projectTerms = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 const toolbarButtonClass = 'h-10 w-[72px] shrink-0 gap-1 px-1 text-sm bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8] [&_svg]:size-4';
+const exportMasterButtonClass = 'h-10 w-[86px] shrink-0 gap-1 px-1 text-sm bg-[#d9f99d] text-slate-950 hover:bg-[#bef264] [&_svg]:size-4';
+const exportDetailButtonClass = 'h-10 w-[86px] shrink-0 gap-1 px-1 text-sm bg-[#bae6fd] text-slate-950 hover:bg-[#7dd3fc] [&_svg]:size-4';
 
 const researchCategories = [
   '一般研究計劃',
@@ -560,6 +563,10 @@ export default function Home() {
     );
   }
 
+  function downloadCsv(path: string) {
+    window.location.href = path;
+  }
+
   return (
     <main className="min-h-screen bg-[#2bb9b0] text-slate-950">
       <header className="border-b border-emerald-900 bg-black text-white">
@@ -606,6 +613,22 @@ export default function Home() {
               <Button className={toolbarButtonClass} variant="outline" onClick={() => patchForm({ closed: true })}>
                 <LockKeyhole />
                 結案
+              </Button>
+              <Button
+                className={exportMasterButtonClass}
+                variant="outline"
+                onClick={() => downloadCsv('/api/export/projects')}
+              >
+                <Download />
+                主檔CSV
+              </Button>
+              <Button
+                className={exportDetailButtonClass}
+                variant="outline"
+                onClick={() => downloadCsv('/api/export/project-budget')}
+              >
+                <Download />
+                明細CSV
               </Button>
             </div>
             <div
