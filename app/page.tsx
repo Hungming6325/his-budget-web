@@ -608,7 +608,10 @@ export default function Home() {
                 結案
               </Button>
             </div>
-            <div className="mb-1 ml-auto shrink-0 self-end px-2 text-sm font-semibold text-yellow-100">
+            <div
+              className="mb-1 ml-auto shrink-0 self-end px-2 text-sm font-semibold text-yellow-100"
+              style={{ marginRight: 'max(0px, calc((100vw - 1080px) / 2))' }}
+            >
               版本 1141106
             </div>
           </div>
