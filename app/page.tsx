@@ -631,20 +631,19 @@ export default function Home() {
                 明細CSV
               </Button>
             </div>
-            <div
-              className="mb-1 ml-auto shrink-0 self-end px-2 text-sm font-semibold text-yellow-100"
-              style={{ marginRight: 'max(0px, calc((100vw - 1080px) / 2))' }}
-            >
-              版本 1141106
-            </div>
           </div>
         </div>
       </header>
 
       <div className="overflow-x-auto px-1 py-1">
         <section className="mx-auto min-w-[1080px] max-w-[1080px] bg-[#2bb9b0] pb-1">
-          <div className="relative mx-auto mb-1 w-[400px] border border-yellow-200 bg-[#087c73] px-4 py-0 text-center text-xl font-semibold leading-7 text-yellow-200">
-            研究計劃經費預算建檔
+          <div className="relative mb-1 h-7">
+            <div className="mx-auto w-[400px] border border-yellow-200 bg-[#087c73] px-4 py-0 text-center text-xl font-semibold leading-7 text-yellow-200">
+              研究計劃經費預算建檔
+            </div>
+            <div className="absolute bottom-0 right-0 px-2 text-sm font-semibold leading-7 text-yellow-100">
+              版本 1141106
+            </div>
           </div>
 
           <div className="mb-1 border-2 border-pink-200 bg-[#f5a9c9] px-2 pb-2 pt-1 shadow-[inset_0_0_0_1px_#e485a7]">
