@@ -85,6 +85,19 @@ type ProjectForm = {
   lockedNotice: string;
 };
 
+type ProjectLookupResponse = {
+  error?: string;
+  project?: {
+    form: ProjectForm;
+    rows: BudgetRow[];
+  } | null;
+};
+
+type ProjectSaveResponse = {
+  error?: string;
+  projectNo?: string;
+};
+
 type CodeForm = {
   fundingSource: string;
   nature: string;
@@ -359,7 +372,7 @@ export default function Home() {
 
     try {
       const response = await fetch(`/api/projects?projectNo=${encodeURIComponent(projectNo)}`);
-      const data = await response.json();
+      const data = (await response.json()) as ProjectLookupResponse;
 
       if (!response.ok) {
         patchForm({ lockedNotice: data.error ?? '查詢失敗，請稍後再試。' });
@@ -477,7 +490,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ form, rows }),
       });
-      const data = await response.json();
+      const data = (await response.json()) as ProjectSaveResponse;
 
       if (!response.ok) {
         patchForm({ lockedNotice: data.error ?? '存檔失敗，請稍後再試。' });
@@ -485,7 +498,7 @@ export default function Home() {
       }
 
       setSavedAt(new Date().toLocaleString('zh-TW', { hour12: false }));
-      patchForm({ lockedNotice: `計劃案號 ${data.projectNo} 已存入資料庫。` });
+      patchForm({ lockedNotice: `計劃案號 ${data.projectNo ?? form.projectNo} 已存入資料庫。` });
     } catch {
       patchForm({ lockedNotice: '存檔失敗，請確認 DATABASE_URL 或網路連線。' });
     }

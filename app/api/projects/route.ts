@@ -143,7 +143,10 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  const body = (await request.json()) as {
+    form?: ProjectFormPayload;
+    rows?: BudgetRowPayload[];
+  };
   const form = (body.form ?? {}) as ProjectFormPayload;
   const rows = Array.isArray(body.rows) ? (body.rows as BudgetRowPayload[]) : [];
   const projectNo = text(form.projectNo).trim();
