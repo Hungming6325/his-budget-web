@@ -9,7 +9,6 @@ import {
   ChevronUp,
   FilePlus2,
   LockKeyhole,
-  LogOut,
   RotateCcw,
   Save,
   Search,
@@ -262,6 +261,7 @@ const campuses = [
 
 const startYears = ['114', '115', '116', '117', '118', '119', '120'];
 const projectTerms = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+const toolbarButtonClass = 'w-[104px] shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]';
 
 const researchCategories = [
   '一般研究計劃',
@@ -466,10 +466,6 @@ export default function Home() {
     setSavedAt('已刪除目前畫面資料');
   }
 
-  function leavePage() {
-    patchForm({ lockedNotice: '離開功能已保留，正式版可接回上一層選單。' });
-  }
-
   function moveRecord(direction: 'prev' | 'next') {
     patchForm({ lockedNotice: direction === 'prev' ? '已切換至上筆範例位置。' : '已切換至下筆範例位置。' });
   }
@@ -539,47 +535,43 @@ export default function Home() {
           </div>
           <div className="flex min-w-0 flex-1 items-center justify-end gap-3 overflow-x-auto">
             <div className="flex shrink-0 flex-nowrap gap-2 text-slate-950">
-            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={searchProject}>
+            <Button className={toolbarButtonClass} variant="outline" onClick={searchProject}>
               <Search />
               查詢
             </Button>
-            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={clearForm}>
+            <Button className={toolbarButtonClass} variant="outline" onClick={clearForm}>
               <RotateCcw />
               清除
             </Button>
-            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={leavePage}>
-              <LogOut />
-              離開
-            </Button>
-            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={openNewProjectDialog}>
+            <Button className={toolbarButtonClass} variant="outline" onClick={openNewProjectDialog}>
               <FilePlus2 />
               新增
             </Button>
-            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={deleteProject}>
+            <Button className={toolbarButtonClass} variant="outline" onClick={deleteProject}>
               <Trash2 />
               刪除
             </Button>
-            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={saveProject}>
+            <Button className={toolbarButtonClass} variant="outline" onClick={saveProject}>
               <Save />
               存檔
             </Button>
-            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={() => moveRecord('prev')}>
+            <Button className={toolbarButtonClass} variant="outline" onClick={() => moveRecord('prev')}>
               <ChevronUp />
               上筆
             </Button>
-            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={() => moveRecord('next')}>
+            <Button className={toolbarButtonClass} variant="outline" onClick={() => moveRecord('next')}>
               <ChevronDown />
               下筆
             </Button>
-            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={() => patchForm({ closed: true })}>
+            <Button className={toolbarButtonClass} variant="outline" onClick={() => patchForm({ closed: true })}>
               <LockKeyhole />
               結案
             </Button>
-            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={() => movePage('prev')}>
+            <Button className={toolbarButtonClass} variant="outline" onClick={() => movePage('prev')}>
               <ChevronLeft />
               上一頁
             </Button>
-            <Button className="shrink-0 bg-[#fff8c9] text-slate-950 hover:bg-[#f4eaa8]" variant="outline" onClick={() => movePage('next')}>
+            <Button className={toolbarButtonClass} variant="outline" onClick={() => movePage('next')}>
               <ChevronRight />
               下一頁
             </Button>
@@ -608,121 +600,140 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-[440px_280px_330px] gap-x-[15px] gap-y-0">
+          <div className="grid grid-cols-[735px_330px] gap-x-[15px] gap-y-0">
             <div className="space-y-0">
-              <LegacyField label="計劃編號">
-                <div className="grid grid-cols-[190px_14px_1fr] gap-1">
-                  <Input value={form.projectNo} onChange={(event) => patchForm({ projectNo: event.target.value })} />
-                  <span className="text-center">-</span>
-                  <Input value={form.externalNo} onChange={(event) => patchForm({ externalNo: event.target.value })} />
+              <div className="grid grid-cols-[440px_280px] gap-x-[15px] gap-y-0">
+                <div className="space-y-0">
+                  <LegacyField label="計劃編號">
+                    <div className="grid grid-cols-[190px_14px_1fr] gap-1">
+                      <Input value={form.projectNo} onChange={(event) => patchForm({ projectNo: event.target.value })} />
+                      <span className="text-center">-</span>
+                      <Input value={form.externalNo} onChange={(event) => patchForm({ externalNo: event.target.value })} />
+                    </div>
+                  </LegacyField>
+                  <LegacyField label="機 構 別">
+                    <div className="grid grid-cols-[38px_150px_52px_38px] gap-0.5">
+                      <Input value={form.institutionCode} onChange={(event) => applyInstitutionCode(event.target.value)} />
+                      <Input value={form.institutionName} onChange={(event) => patchForm({ institutionName: event.target.value })} />
+                      <span className="flex items-center justify-end bg-[#07857f] px-2 text-white">院區</span>
+                      <Input value={form.campus} onChange={(event) => patchForm({ campus: event.target.value })} />
+                    </div>
+                  </LegacyField>
+                  <LegacyField label="主持人證號">
+                    <div className="grid grid-cols-[1fr_1fr] gap-1">
+                      <Input value={form.principalName} onChange={(event) => patchForm({ principalName: event.target.value })} />
+                      <Input value={form.principalId} onChange={(event) => applyPrincipal(event.target.value)} />
+                    </div>
+                  </LegacyField>
+                  <LegacyField label="部門代號">
+                    <div className="grid grid-cols-[86px_1fr] gap-1">
+                      <Input value={form.departmentCode} onChange={(event) => patchForm({ departmentCode: event.target.value })} />
+                      <Input value={form.departmentName} onChange={(event) => patchForm({ departmentName: event.target.value })} />
+                    </div>
+                  </LegacyField>
+                  <LegacyField label="國科會編號">
+                    <Input value={form.nsCNo} onChange={(event) => patchForm({ nsCNo: event.target.value })} />
+                  </LegacyField>
+                  <LegacyField label="主持人郵件">
+                    <Input value={form.email} onChange={(event) => patchForm({ email: event.target.value })} />
+                  </LegacyField>
+                  <LegacyField label="總計畫編號">
+                    <div className="grid grid-cols-[135px_132px_24px] gap-0.5">
+                      <Input value={form.parentProjectNo} onChange={(event) => patchForm({ parentProjectNo: event.target.value })} />
+                      <span className="flex items-center justify-end bg-[#2bb9b0] px-2 font-semibold text-fuchsia-800">須繳藥管費</span>
+                      <input
+                        className="m-auto size-5"
+                        type="checkbox"
+                        checked={form.managementFeeRequired}
+                        onChange={(event) => patchForm({ managementFeeRequired: event.target.checked })}
+                      />
+                    </div>
+                  </LegacyField>
+                  <LegacyField label="計劃合作別">
+                    <NativeSelect
+                      className="w-full"
+                      value={form.cooperationType}
+                      onChange={(event) => patchForm({ cooperationType: event.target.value })}
+                    >
+                      <NativeSelectOption value=""></NativeSelectOption>
+                      <NativeSelectOption value="院內合作">院內合作</NativeSelectOption>
+                      <NativeSelectOption value="跨院合作">跨院合作</NativeSelectOption>
+                      <NativeSelectOption value="校外合作">校外合作</NativeSelectOption>
+                    </NativeSelect>
+                  </LegacyField>
                 </div>
-              </LegacyField>
-              <LegacyField label="機 構 別">
-                <div className="grid grid-cols-[38px_150px_52px_38px] gap-0.5">
-                  <Input value={form.institutionCode} onChange={(event) => applyInstitutionCode(event.target.value)} />
-                  <Input value={form.institutionName} onChange={(event) => patchForm({ institutionName: event.target.value })} />
-                  <span className="flex items-center justify-end bg-[#07857f] px-2 text-white">院區</span>
-                  <Input value={form.campus} onChange={(event) => patchForm({ campus: event.target.value })} />
-                </div>
-              </LegacyField>
-              <LegacyField label="主持人證號">
-                <div className="grid grid-cols-[1fr_1fr] gap-1">
-                  <Input value={form.principalName} onChange={(event) => patchForm({ principalName: event.target.value })} />
-                  <Input value={form.principalId} onChange={(event) => applyPrincipal(event.target.value)} />
-                </div>
-              </LegacyField>
-              <LegacyField label="部門代號">
-                <div className="grid grid-cols-[86px_1fr] gap-1">
-                  <Input value={form.departmentCode} onChange={(event) => patchForm({ departmentCode: event.target.value })} />
-                  <Input value={form.departmentName} onChange={(event) => patchForm({ departmentName: event.target.value })} />
-                </div>
-              </LegacyField>
-              <LegacyField label="國科會編號">
-                <Input value={form.nsCNo} onChange={(event) => patchForm({ nsCNo: event.target.value })} />
-              </LegacyField>
-              <LegacyField label="主持人郵件">
-                <Input value={form.email} onChange={(event) => patchForm({ email: event.target.value })} />
-              </LegacyField>
-              <LegacyField label="總計畫編號">
-                <div className="grid grid-cols-[135px_132px_24px] gap-0.5">
-                  <Input value={form.parentProjectNo} onChange={(event) => patchForm({ parentProjectNo: event.target.value })} />
-                  <span className="flex items-center justify-end bg-[#2bb9b0] px-2 font-semibold text-fuchsia-800">須繳藥管費</span>
-                  <input
-                    className="m-auto size-5"
-                    type="checkbox"
-                    checked={form.managementFeeRequired}
-                    onChange={(event) => patchForm({ managementFeeRequired: event.target.checked })}
-                  />
-                </div>
-              </LegacyField>
-              <LegacyField label="計劃合作別">
-                <NativeSelect
-                  className="w-full"
-                  value={form.cooperationType}
-                  onChange={(event) => patchForm({ cooperationType: event.target.value })}
-                >
-                  <NativeSelectOption value=""></NativeSelectOption>
-                  <NativeSelectOption value="院內合作">院內合作</NativeSelectOption>
-                  <NativeSelectOption value="跨院合作">跨院合作</NativeSelectOption>
-                  <NativeSelectOption value="校外合作">校外合作</NativeSelectOption>
-                </NativeSelect>
-              </LegacyField>
-            </div>
 
-            <div className="space-y-0">
-              <LegacyField label="研究類別">
-                <NativeSelect
-                  className="w-full"
-                  value={form.category}
-                  onChange={(event) => patchForm({ category: event.target.value })}
-                >
-                  <NativeSelectOption value=""></NativeSelectOption>
-                  {researchCategories.map((category) => (
-                    <NativeSelectOption key={category} value={category}>
-                      {category}
-                    </NativeSelectOption>
-                  ))}
-                </NativeSelect>
-              </LegacyField>
-              <LegacyField label="開始日期">
-                <Input value={form.startDate} onChange={(event) => patchForm({ startDate: event.target.value })} />
-              </LegacyField>
-              <LegacyField label="結束日期">
-                <Input value={form.endDate} onChange={(event) => patchForm({ endDate: event.target.value })} />
-              </LegacyField>
-              <LegacyField label="展延日期">
-                <Input value={form.extensionDate} onChange={(event) => patchForm({ extensionDate: event.target.value })} />
-              </LegacyField>
-              <LegacyField label="統一編號">
-                <div className="grid grid-cols-[1fr_1fr] gap-0.5">
-                  <Input value={form.taxId} onChange={(event) => patchForm({ taxId: event.target.value })} />
-                  <Input value={form.externalNo} onChange={(event) => patchForm({ externalNo: event.target.value })} />
+                <div className="space-y-0">
+                  <LegacyField label="研究類別">
+                    <NativeSelect
+                      className="w-full"
+                      value={form.category}
+                      onChange={(event) => patchForm({ category: event.target.value })}
+                    >
+                      <NativeSelectOption value=""></NativeSelectOption>
+                      {researchCategories.map((category) => (
+                        <NativeSelectOption key={category} value={category}>
+                          {category}
+                        </NativeSelectOption>
+                      ))}
+                    </NativeSelect>
+                  </LegacyField>
+                  <LegacyField label="開始日期">
+                    <Input value={form.startDate} onChange={(event) => patchForm({ startDate: event.target.value })} />
+                  </LegacyField>
+                  <LegacyField label="結束日期">
+                    <Input value={form.endDate} onChange={(event) => patchForm({ endDate: event.target.value })} />
+                  </LegacyField>
+                  <LegacyField label="展延日期">
+                    <Input value={form.extensionDate} onChange={(event) => patchForm({ extensionDate: event.target.value })} />
+                  </LegacyField>
+                  <LegacyField label="統一編號">
+                    <div className="grid grid-cols-[1fr_1fr] gap-0.5">
+                      <Input value={form.taxId} onChange={(event) => patchForm({ taxId: event.target.value })} />
+                      <Input value={form.externalNo} onChange={(event) => patchForm({ externalNo: event.target.value })} />
+                    </div>
+                  </LegacyField>
+                  <LegacyField label="IACUC編號">
+                    <Input value={form.iacucNo} onChange={(event) => patchForm({ iacucNo: event.target.value })} />
+                  </LegacyField>
+                  <LegacyField label="基本設定費">
+                    <NativeSelect
+                      className="w-full"
+                      value={form.baseSetupFee}
+                      onChange={(event) => patchForm({ baseSetupFee: event.target.value })}
+                    >
+                      <NativeSelectOption value=""></NativeSelectOption>
+                      <NativeSelectOption value="免收">免收</NativeSelectOption>
+                      <NativeSelectOption value="應收">應收</NativeSelectOption>
+                    </NativeSelect>
+                  </LegacyField>
+                  <LegacyField label="人員職類">
+                    <NativeSelect
+                      className="w-full"
+                      value={form.staffType}
+                      onChange={(event) => patchForm({ staffType: event.target.value })}
+                    >
+                      <NativeSelectOption value=""></NativeSelectOption>
+                      <NativeSelectOption value="專任">專任</NativeSelectOption>
+                      <NativeSelectOption value="兼任">兼任</NativeSelectOption>
+                    </NativeSelect>
+                  </LegacyField>
                 </div>
+              </div>
+
+              <LegacyField label="計劃名稱">
+                <Input className="h-[62px]" value={form.projectName} onChange={(event) => patchForm({ projectName: event.target.value })} />
               </LegacyField>
-              <LegacyField label="IACUC編號">
-                <Input value={form.iacucNo} onChange={(event) => patchForm({ iacucNo: event.target.value })} />
-              </LegacyField>
-              <LegacyField label="基本設定費">
-                <NativeSelect
-                  className="w-full"
-                  value={form.baseSetupFee}
-                  onChange={(event) => patchForm({ baseSetupFee: event.target.value })}
-                >
-                  <NativeSelectOption value=""></NativeSelectOption>
-                  <NativeSelectOption value="免收">免收</NativeSelectOption>
-                  <NativeSelectOption value="應收">應收</NativeSelectOption>
-                </NativeSelect>
-              </LegacyField>
-              <LegacyField label="人員職類">
-                <NativeSelect
-                  className="w-full"
-                  value={form.staffType}
-                  onChange={(event) => patchForm({ staffType: event.target.value })}
-                >
-                  <NativeSelectOption value=""></NativeSelectOption>
-                  <NativeSelectOption value="專任">專任</NativeSelectOption>
-                  <NativeSelectOption value="兼任">兼任</NativeSelectOption>
-                </NativeSelect>
+              <LegacyField label="結案註記">
+                <div className="grid grid-cols-[38px_154px_1fr] gap-0.5">
+                  <Input value={form.closed ? 'Y' : ''} onChange={(event) => patchForm({ closed: event.target.value.toUpperCase() === 'Y' })} />
+                  <span className="flex items-center justify-end bg-[#2bb9b0] px-2 font-semibold text-fuchsia-800">管制相對補助</span>
+                  <NativeSelect className="w-full">
+                    <NativeSelectOption value=""></NativeSelectOption>
+                    <NativeSelectOption value="Y">Y</NativeSelectOption>
+                    <NativeSelectOption value="N">N</NativeSelectOption>
+                  </NativeSelect>
+                </div>
               </LegacyField>
             </div>
 
@@ -819,24 +830,6 @@ export default function Home() {
                 </NativeSelect>
               </LegacyField>
             </div>
-          </div>
-
-          <div className="mt-0 grid grid-cols-[440px_280px_330px] gap-x-[15px] gap-y-0">
-            <LegacyField className="col-span-2" label="計劃名稱">
-                <Input className="h-[62px]" value={form.projectName} onChange={(event) => patchForm({ projectName: event.target.value })} />
-            </LegacyField>
-            <div />
-            <LegacyField className="col-span-2" label="結案註記">
-              <div className="grid grid-cols-[38px_154px_1fr] gap-0.5">
-                <Input value={form.closed ? 'Y' : ''} onChange={(event) => patchForm({ closed: event.target.value.toUpperCase() === 'Y' })} />
-                <span className="flex items-center justify-end bg-[#2bb9b0] px-2 font-semibold text-fuchsia-800">管制相對補助</span>
-                <NativeSelect className="w-full">
-                  <NativeSelectOption value=""></NativeSelectOption>
-                  <NativeSelectOption value="Y">Y</NativeSelectOption>
-                  <NativeSelectOption value="N">N</NativeSelectOption>
-                </NativeSelect>
-              </div>
-            </LegacyField>
           </div>
 
           <section className="mt-2">
