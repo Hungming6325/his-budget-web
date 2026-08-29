@@ -564,7 +564,7 @@ export default function Home() {
     <main className="min-h-screen bg-[#2bb9b0] text-slate-950">
       <header className="border-b border-emerald-900 bg-black text-white">
         <div className="flex items-center justify-between gap-4 px-3 py-2">
-          <div className="flex h-14 w-48 shrink-0 items-center overflow-hidden rounded border border-emerald-700 bg-black md:w-64">
+          <div className="flex h-14 w-48 shrink-0 items-center overflow-hidden bg-black md:w-64">
             <Image
               src="/cgust-logo.png"
               alt="長庚科技大學"
@@ -573,7 +573,7 @@ export default function Home() {
               className="h-full w-full object-contain"
             />
           </div>
-          <div className="flex min-w-0 flex-1 items-center justify-start gap-2 overflow-hidden">
+          <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
             <div className="flex shrink-0 flex-nowrap gap-1.5 text-slate-950">
               <Button className={toolbarButtonClass} variant="outline" onClick={openNewProjectDialog}>
                 <FilePlus2 />
@@ -608,6 +608,9 @@ export default function Home() {
                 結案
               </Button>
             </div>
+            <div className="mb-1 ml-auto shrink-0 self-end px-2 text-sm font-semibold text-yellow-100">
+              版本 1141106
+            </div>
           </div>
         </div>
       </header>
@@ -616,9 +619,6 @@ export default function Home() {
         <section className="mx-auto min-w-[1080px] max-w-[1080px] bg-[#2bb9b0] pb-1">
           <div className="relative mx-auto mb-1 w-[400px] border border-yellow-200 bg-[#087c73] px-4 py-0 text-center text-xl font-semibold leading-7 text-yellow-200">
             研究計劃經費預算建檔
-            <span className="absolute right-[-335px] top-0 text-base font-semibold leading-7 text-yellow-100">
-              版本 1141106
-            </span>
           </div>
 
           <div className="mb-1 border-2 border-pink-200 bg-[#f5a9c9] px-2 pb-2 pt-1 shadow-[inset_0_0_0_1px_#e485a7]">
