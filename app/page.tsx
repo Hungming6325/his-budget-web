@@ -625,8 +625,8 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#2bb9b0] text-slate-950">
       <header className="border-b border-emerald-900 bg-black text-white">
-        <div className="flex items-center justify-between gap-4 px-3 py-1">
-          <div className="flex h-12 w-48 shrink-0 items-center overflow-hidden bg-black md:w-64">
+        <div className="flex items-center justify-between gap-8 px-3 py-1.5">
+          <div className="flex h-[52px] w-48 shrink-0 items-center overflow-hidden bg-black md:w-64">
             <Image
               src="/cgust-logo.png"
               alt="長庚科技大學"
@@ -635,8 +635,8 @@ export default function Home() {
               className="h-full w-full object-contain"
             />
           </div>
-          <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
-            <div className="flex shrink-0 flex-nowrap gap-1.5 text-slate-950">
+          <div className="flex min-w-0 flex-1 items-center justify-end overflow-hidden pl-5">
+            <div className="flex shrink-0 flex-nowrap gap-2.5 text-slate-950">
               <Button className={toolbarButtonClass} variant="outline" onClick={openNewProjectDialog}>
                 <FilePlus2 />
                 新增
@@ -692,11 +692,11 @@ export default function Home() {
 
       <div className="overflow-x-auto px-1 py-0.5">
         <section className="mx-auto min-w-[1080px] max-w-[1080px] bg-[#2bb9b0] pb-0.5 [&_input:not([type=checkbox])]:h-7 [&_select]:h-7">
-          <div className="relative mb-0.5 h-6">
-            <div className="mx-auto w-[400px] border border-yellow-200 bg-[#087c73] px-4 py-0 text-center text-lg font-semibold leading-6 text-yellow-200">
+          <div className="relative mb-1 flex h-[34px] items-center">
+            <div className="mx-auto w-[400px] border border-yellow-200 bg-[#087c73] px-4 py-0.5 text-center text-lg font-semibold leading-6 text-yellow-200">
               研究計劃經費預算建檔
             </div>
-            <div className="absolute bottom-0 right-0 px-2 text-sm font-semibold leading-6 text-yellow-100">
+            <div className="absolute bottom-1 right-0 px-2 text-sm font-semibold leading-6 text-yellow-100">
               版本 1141106
             </div>
           </div>
