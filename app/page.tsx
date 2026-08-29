@@ -635,7 +635,10 @@ export default function Home() {
               className="h-full w-full object-contain"
             />
           </div>
-          <div className="flex min-w-0 flex-1 items-center justify-end overflow-hidden pl-5">
+          <div
+            className="flex min-w-0 flex-1 items-center justify-end overflow-hidden pl-5"
+            style={{ marginRight: 'max(0px, calc((100vw - 1080px) / 2 - 12px))' }}
+          >
             <div className="flex shrink-0 flex-nowrap gap-2.5 text-slate-950">
               <Button className={toolbarButtonClass} variant="outline" onClick={openNewProjectDialog}>
                 <FilePlus2 />
